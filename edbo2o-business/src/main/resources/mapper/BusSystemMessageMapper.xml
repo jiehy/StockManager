@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.wolfcode.business.message.mapper.BusSystemMessageMapper">
+    
+    <resultMap type="BusSystemMessage" id="BusSystemMessageResult">
+        <result property="id"    column="id"    />
+        <result property="messageTitle"    column="message_title"    />
+        <result property="messageOrderNumber"    column="message_order_number"    />
+        <result property="messageType"    column="message_type"    />
+        <result property="creationTime"    column="creation_time"    />
+        <result property="expireTime"    column="expire_time"    />
+        <result property="messageContent"    column="message_content"    />
+        <result property="recipient"    column="recipient"    />
+    </resultMap>
+
+    <sql id="selectBusSystemMessageVo">
+        select id, message_title, message_order_number, message_type, creation_time, expire_time, message_content, recipient from bus_system_message
+    </sql>
+
+    <select id="selectBusSystemMessageList" parameterType="BusSystemMessage" resultMap="BusSystemMessageResult">
+        <include refid="selectBusSystemMessageVo"/>
+        <where>  
+            <if test="messageTitle != null  and messageTitle != ''"> and message_title = #{messageTitle}</if>
+            <if test="messageOrderNumber != null  and messageOrderNumber != ''"> and message_order_number = #{messageOrderNumber}</if>
+            <if test="messageType != null  and messageType != ''"> and message_type = #{messageType}</if>
+            <if test="creationTime != null "> and creation_time = #{creationTime}</if>
+            <if test="expireTime != null "> and expire_time = #{expireTime}</if>
+            <if test="messageContent != null  and messageContent != ''"> and message_content = #{messageContent}</if>
+            <if test="recipient != null  and recipient != ''"> and recipient = #{recipient}</if>
+        </where>
+    </select>
+    
+    <select id="selectBusSystemMessageById" parameterType="Long" resultMap="BusSystemMessageResult">
+        <include refid="selectBusSystemMessageVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertBusSystemMessage" parameterType="BusSystemMessage" useGeneratedKeys="true" keyProperty="id">
+        insert into bus_system_message
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="messageTitle != null">message_title,</if>
+            <if test="messageOrderNumber != null">message_order_number,</if>
+            <if test="messageType != null">message_type,</if>
+            <if test="creationTime != null">creation_time,</if>
+            <if test="expireTime != null">expire_time,</if>
+            <if test="messageContent != null">message_content,</if>
+            <if test="recipient != null">recipient,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="messageTitle != null">#{messageTitle},</if>
+            <if test="messageOrderNumber != null">#{messageOrderNumber},</if>
+            <if test="messageType != null">#{messageType},</if>
+            <if test="creationTime != null">#{creationTime},</if>
+            <if test="expireTime != null">#{expireTime},</if>
+            <if test="messageContent != null">#{messageContent},</if>
+            <if test="recipient != null">#{recipient},</if>
+         </trim>
+    </insert>
+
+    <update id="updateBusSystemMessage" parameterType="BusSystemMessage">
+        update bus_system_message
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="messageTitle != null">message_title = #{messageTitle},</if>
+            <if test="messageOrderNumber != null">message_order_number = #{messageOrderNumber},</if>
+            <if test="messageType != null">message_type = #{messageType},</if>
+            <if test="creationTime != null">creation_time = #{creationTime},</if>
+            <if test="expireTime != null">expire_time = #{expireTime},</if>
+            <if test="messageContent != null">message_content = #{messageContent},</if>
+            <if test="recipient != null">recipient = #{recipient},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteBusSystemMessageById" parameterType="Long">
+        delete from bus_system_message where id = #{id}
+    </delete>
+
+    <delete id="deleteBusSystemMessageByIds" parameterType="String">
+        delete from bus_system_message where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

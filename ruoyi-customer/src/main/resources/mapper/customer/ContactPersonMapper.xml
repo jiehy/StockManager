@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.wolfcode.customer.contact.mapper.ContactPersonMapper">
+
+    <resultMap type="ContactPerson" id="ContactPersonResult">
+        <result property="id" column="id"/>
+        <result property="enterpriseCustomers" column="enterprise_customers"/>
+        <result property="name" column="name"/>
+        <result property="sex" column="sex"/>
+        <result property="age" column="age"/>
+        <result property="phone" column="phone"/>
+        <result property="job" column="job"/>
+        <result property="dept" column="dept"/>
+        <result property="employmentStatus" column="employment_status"/>
+        <result property="entryPerson" column="entry_person"/>
+        <result property="entryTime" column="entry_time"/>
+    </resultMap>
+
+    <sql id="selectContactPersonVo">
+        select id,
+               enterprise_customers,
+               name,
+               sex,
+               age,
+               phone,
+               job,
+               dept,
+               employment_status,
+               entry_person,
+               entry_time
+        from contact_person
+    </sql>
+
+    <select id="selectContactPersonList" parameterType="ContactPerson" resultMap="ContactPersonResult">
+        <include refid="selectContactPersonVo"/>
+        <where>
+            <if test="enterpriseCustomers != null  and enterpriseCustomers != ''">and enterprise_customers =
+                #{enterpriseCustomers}
+            </if>
+            <if test="keyword != null  and keyword != ''">and enterprise_customers like concat('%', #{keyword}, '%')
+            </if>
+            <if test="name != null  and name != ''">and name like concat('%', #{name}, '%')</if>
+            <if test="employmentStatus != null ">and employment_status = #{employmentStatus}</if>
+        </where>
+    </select>
+
+    <select id="selectContactPersonById" parameterType="Long" resultMap="ContactPersonResult">
+        <include refid="selectContactPersonVo"/>
+        where id = #{id}
+    </select>
+    <select id="selectCustomerListName" resultType="java.lang.String">
+        select name
+        from contact_person
+        where enterprise_customers = #{customerName}
+    </select>
+
+    <insert id="insertContactPerson" parameterType="ContactPerson">
+        insert into contact_person
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+
+            <if test="enterpriseCustomers != null and enterpriseCustomers != ''">enterprise_customers,</if>
+            <if test="name != null and name != ''">name,</if>
+            <if test="sex != null">sex,</if>
+            <if test="age != null">age,</if>
+            <if test="phone != null and phone != ''">phone,</if>
+            <if test="job != null and job != ''">job,</if>
+            <if test="dept != null and dept != ''">dept,</if>
+            <if test="employmentStatus != null">employment_status,</if>
+            <if test="entryPerson != null">entry_person,</if>
+            <if test="entryTime != null">entry_time,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+
+            <if test="enterpriseCustomers != null and enterpriseCustomers != ''">#{enterpriseCustomers},</if>
+            <if test="name != null and name != ''">#{name},</if>
+            <if test="sex != null">#{sex},</if>
+            <if test="age != null">#{age},</if>
+            <if test="phone != null and phone != ''">#{phone},</if>
+            <if test="job != null and job != ''">#{job},</if>
+            <if test="dept != null and dept != ''">#{dept},</if>
+            <if test="employmentStatus != null">#{employmentStatus},</if>
+            <if test="entryPerson != null">#{entryPerson},</if>
+            <if test="entryTime != null">#{entryTime},</if>
+        </trim>
+    </insert>
+
+    <update id="updateContactPerson" parameterType="ContactPerson">
+        update contact_person
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="enterpriseCustomers != null and enterpriseCustomers != ''">enterprise_customers =
+                #{enterpriseCustomers},
+            </if>
+            <if test="name != null and name != ''">name = #{name},</if>
+            <if test="sex != null">sex = #{sex},</if>
+            <if test="age != null">age = #{age},</if>
+            <if test="phone != null and phone != ''">phone = #{phone},</if>
+            <if test="job != null and job != ''">job = #{job},</if>
+            <if test="dept != null and dept != ''">dept = #{dept},</if>
+            <if test="employmentStatus != null">employment_status = #{employmentStatus},</if>
+            <if test="entryPerson != null">entry_person = #{entryPerson},</if>
+            <if test="entryTime != null">entry_time = #{entryTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteContactPersonById" parameterType="Long">
+        delete
+        from contact_person
+        where id = #{id}
+    </delete>
+
+    <delete id="deleteContactPersonByIds" parameterType="String">
+        delete from contact_person where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

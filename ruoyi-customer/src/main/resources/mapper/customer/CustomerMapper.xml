@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.wolfcode.customer.information.mapper.CustomerMapper">
+
+    <resultMap type="Customer" id="CustomerResult">
+        <result property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="legalRepresentative" column="legal_representative"/>
+        <result property="dateOfEstablishment" column="date_of_establishment"/>
+        <result property="operatingStatus" column="operating_status"/>
+        <result property="registeredCapital" column="registered_capital"/>
+        <result property="industry" column="Industry"/>
+        <result property="province" column="province"/>
+        <result property="address" column="address"/>
+        <result property="businessScope" column="business_scope"/>
+        <result property="entryPerson" column="entry_person"/>
+        <result property="saleMan" column="sale_man"/>
+        <result property="entryTime" column="entry_time"/>
+    </resultMap>
+
+    <sql id="selectCustomerVo">
+        select id,
+               name,
+               legal_representative,
+               date_of_establishment,
+               operating_status,
+               registered_capital,
+               Industry,
+               province,
+               address,
+               business_scope,
+               entry_person,
+               sale_man,
+               entry_time
+        from customer
+    </sql>
+
+    <select id="selectCustomerList" parameterType="Customer" resultMap="CustomerResult">
+        <include refid="selectCustomerVo"/>
+        <where>
+            <if test="name != null  and name != ''">and name like concat('%', #{name}, '%')</if>
+            <if test="keyword != null  and keyword != ''">
+                and name like concat('%', #{keyword}, '%')
+                or legal_representative like concat('%', #{keyword}, '%')
+                or Industry like concat('%', #{keyword}, '%')
+            </if>
+            <if test="operatingStatus != null ">and operating_status = #{operatingStatus}</if>
+            <if test="province != null ">and province = #{province}</if>
+            <if test="params.beginEntryTime != null and params.beginEntryTime != '' and params.endEntryTime != null and params.endEntryTime != ''">
+                and entry_time between #{params.beginEntryTime} and #{params.endEntryTime}
+            </if>
+        </where>
+    </select>
+
+    <select id="selectCustomerById" parameterType="Long" resultMap="CustomerResult">
+        <include refid="selectCustomerVo"/>
+        where id = #{id}
+    </select>
+    <select id="selectCustomerListByname" resultType="java.lang.String">
+        select name
+        from customer
+    </select>
+
+
+    <insert id="insertCustomer" parameterType="Customer">
+        insert into customer
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+
+            <if test="name != null and name != ''">name,</if>
+            <if test="legalRepresentative != null and legalRepresentative != ''">legal_representative,</if>
+            <if test="dateOfEstablishment != null">date_of_establishment,</if>
+            <if test="operatingStatus != null">operating_status,</if>
+            <if test="registeredCapital != null">registered_capital,</if>
+            <if test="industry != null and industry != ''">Industry,</if>
+            <if test="province != null">province,</if>
+            <if test="address != null and address != ''">address,</if>
+            <if test="businessScope != null and businessScope != ''">business_scope,</if>
+            <if test="entryPerson != null">entry_person,</if>
+            <if test="saleMan != null">sale_man,</if>
+            <if test="entryTime != null">entry_time,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+
+            <if test="name != null and name != ''">#{name},</if>
+            <if test="legalRepresentative != null and legalRepresentative != ''">#{legalRepresentative},</if>
+            <if test="dateOfEstablishment != null">#{dateOfEstablishment},</if>
+            <if test="operatingStatus != null">#{operatingStatus},</if>
+            <if test="registeredCapital != null">#{registeredCapital},</if>
+            <if test="industry != null and industry != ''">#{industry},</if>
+            <if test="province != null">#{province},</if>
+            <if test="address != null and address != ''">#{address},</if>
+            <if test="businessScope != null and businessScope != ''">#{businessScope},</if>
+            <if test="entryPerson != null">#{entryPerson},</if>
+            <if test="saleMan != null">#{saleMan},</if>
+            <if test="entryTime != null">#{entryTime},</if>
+        </trim>
+    </insert>
+
+    <update id="updateCustomer" parameterType="Customer">
+        update customer
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="name != null and name != ''">name = #{name},</if>
+            <if test="legalRepresentative != null and legalRepresentative != ''">legal_representative =
+                #{legalRepresentative},
+            </if>
+            <if test="dateOfEstablishment != null">date_of_establishment = #{dateOfEstablishment},</if>
+            <if test="operatingStatus != null">operating_status = #{operatingStatus},</if>
+            <if test="registeredCapital != null">registered_capital = #{registeredCapital},</if>
+            <if test="industry != null and industry != ''">Industry = #{industry},</if>
+            <if test="province != null">province = #{province},</if>
+            <if test="address != null and address != ''">address = #{address},</if>
+            <if test="businessScope != null and businessScope != ''">business_scope = #{businessScope},</if>
+            <if test="entryPerson != null">entry_person = #{entryPerson},</if>
+            <if test="saleMan != null">sale_man = #{saleMan},</if>
+            <if test="entryTime != null">entry_time = #{entryTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteCustomerById" parameterType="Long">
+        delete
+        from customer
+        where id = #{id}
+    </delete>
+
+    <delete id="deleteCustomerByIds" parameterType="String">
+        delete from customer where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

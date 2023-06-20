@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.wolfcode.business.archives.mapper.BusCustomerArchivesMapper">
+
+    <resultMap type="BusCustomerArchives" id="BusCustomerFollowUpResult">
+        <result property="id" column="id"/>
+        <result property="customerName" column="customer_name"/>
+        <result property="customerPhone" column="customer_phone"/>
+        <result property="customerVip" column="customer_vip"/>
+        <result property="gender" column="gender"/>
+        <result property="carSeries" column="car_series"/>
+        <result property="enterUser" column="enter_user"/>
+        <result property="enterTime" column="enter_time"/>
+        <result property="isPayRecord" column="is_pay_record"/>
+    </resultMap>
+
+    <sql id="selectBusCustomerFollowUpVo">
+        select id,
+               customer_name,
+               customer_phone,
+               customer_vip,
+               gender,
+               car_series,
+               enter_user,
+               enter_time,
+               is_pay_record
+        from bus_customer_follow_up
+    </sql>
+
+    <select id="selectBusCustomerFollowUpList"
+            resultMap="BusCustomerFollowUpResult">
+        <include refid="selectBusCustomerFollowUpVo"/>
+        <where>
+            <if test="keyword != null">and (customer_name like concat('%', #{keyword}, '%') or customer_phone like
+                concat('%', #{keyword}, '%'))
+            </if>
+            <if test="customerVip != null ">and customer_vip = #{customerVip}</if>
+            <if test="gender != null  and gender != ''">and gender = #{gender}</if>
+            <if test="carSeries != null  and carSeries != ''">and car_series = #{carSeries}</if>
+            <if test="enterUser != null  and enterUser != ''">and enter_user = #{enterUser}</if>
+            <if test="enterTime != null ">and DATE_FORMAT(enter_time,'%Y-%m-%d') =
+                DATE_FORMAT(#{enterTime},'%Y-%m-%d')
+            </if>
+            <if test="isPayRecord != null ">and is_pay_record = #{isPayRecord}</if>
+        </where>
+    </select>
+
+    <select id="selectBusCustomerFollowUpListExport"
+            resultMap="BusCustomerFollowUpResult">
+        <include refid="selectBusCustomerFollowUpVo"/>
+    </select>
+
+    <select id="selectBusCustomerFollowUpById" parameterType="Long" resultMap="BusCustomerFollowUpResult">
+        <include refid="selectBusCustomerFollowUpVo"/>
+        where id = #{id}
+    </select>
+    <select id="selectBusCustomerFollowUpByPhone" resultType="Long">
+        SELECT id
+        FROM bus_customer_follow_up
+        WHERE customer_phone = #{phone}
+        LIMIT 1
+    </select>
+    <select id="selectBusCustomerFollowUpEnterList" resultType="java.lang.String">
+        SELECT DISTINCT IFNULL(enter_user, '错误数据')
+        FROM bus_customer_follow_up
+    </select>
+
+    <insert id="insertBusCustomerFollowUp"  useGeneratedKeys="true" keyProperty="id">
+        insert into bus_customer_follow_up
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="customerName != null">customer_name,</if>
+            <if test="customerPhone != null">customer_phone,</if>
+            <if test="customerVip != null">customer_vip,</if>
+            <if test="gender != null">gender,</if>
+            <if test="carSeries != null">car_series,</if>
+            <if test="enterUser != null">enter_user,</if>
+            enter_time,
+            <if test="isPayRecord != null">is_pay_record,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="customerName != null">#{customerName},</if>
+            <if test="customerPhone != null">#{customerPhone},</if>
+            <if test="customerVip != null">#{customerVip},</if>
+            <if test="gender != null">#{gender},</if>
+            <if test="carSeries != null">#{carSeries},</if>
+            <if test="enterUser != null">#{enterUser},</if>
+            now(),
+            <if test="isPayRecord != null">#{isPayRecord},</if>
+        </trim>
+    </insert>
+
+    <update id="updateBusCustomerFollowUp">
+        update bus_customer_follow_up
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="customerName != null">customer_name = #{customerName},</if>
+            <if test="customerPhone != null">customer_phone = #{customerPhone},</if>
+            <if test="customerVip != null">customer_vip = #{customerVip},</if>
+            <if test="gender != null">gender = #{gender},</if>
+            <if test="carSeries != null">car_series = #{carSeries},</if>
+            <if test="enterUser != null">enter_user = #{enterUser},</if>
+            <if test="enterTime != null">enter_time = #{enterTime},</if>
+            <if test="isPayRecord != null">is_pay_record = #{isPayRecord},</if>
+        </trim>
+        where id = #{id}
+    </update>
+    <update id="updateBusCustomerFollowUpPayRecordByPhone">
+        update bus_customer_follow_up
+        SET is_pay_record=#{payRecordHave}
+        WHERE customer_phone = #{customerPhone}
+    </update>
+
+    <delete id="deleteBusCustomerFollowUpById" parameterType="Long">
+        delete
+        from bus_customer_follow_up
+        where id = #{id}
+    </delete>
+
+    <delete id="deleteBusCustomerFollowUpByIds" parameterType="String">
+        delete from bus_customer_follow_up where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

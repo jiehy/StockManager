@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.wolfcode.warehouse.mapper.InboundOutboundManagementMapper">
+    
+    <resultMap type="InboundOutboundManagement" id="InboundOutboundManagementResult">
+        <result property="id"    column="id"    />
+        <result property="warehouse"    column="warehouse"    />
+        <result property="type"    column="type"    />
+        <result property="entryExitTime"    column="entry_exit_time"    />
+        <result property="operationTime"    column="operation_time"    />
+        <result property="operator"    column="operator"    />
+        <result property="info"    column="info"    />
+        <result property="status"    column="status"    />
+        <result property="total"    column="total"    />
+        <result property="totalAmount"    column="total_amount"    />
+    </resultMap>
+
+    <sql id="selectInboundOutboundManagementVo">
+        select id, warehouse, type, entry_exit_time, operation_time, operator, info, status, total, total_amount from warehouse
+    </sql>
+
+    <select id="selectInboundOutboundManagementList" parameterType="InboundOutboundManagement" resultMap="InboundOutboundManagementResult">
+        <include refid="selectInboundOutboundManagementVo"/>
+        <where>  
+            <if test="warehouse != null  and warehouse != ''"> and warehouse = #{warehouse}</if>
+            <if test="type != null "> and type = #{type}</if>
+            <if test="entryExitTime != null "> and entry_exit_time = #{entryExitTime}</if>
+            <if test="operationTime != null "> and operation_time = #{operationTime}</if>
+            <if test="operator != null  and operator != ''"> and operator = #{operator}</if>
+            <if test="info != null  and info != ''"> and info = #{info}</if>
+            <if test="status != null "> and status = #{status}</if>
+            <if test="total != null "> and total = #{total}</if>
+            <if test="totalAmount != null "> and total_amount = #{totalAmount}</if>
+        </where>
+    </select>
+    
+    <select id="selectInboundOutboundManagementById" parameterType="Long" resultMap="InboundOutboundManagementResult">
+        <include refid="selectInboundOutboundManagementVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertInboundOutboundManagement" parameterType="InboundOutboundManagement" useGeneratedKeys="true" keyProperty="id">
+        insert into warehouse
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="warehouse != null">warehouse,</if>
+            <if test="type != null">type,</if>
+            <if test="entryExitTime != null">entry_exit_time,</if>
+            <if test="operationTime != null">operation_time,</if>
+            <if test="operator != null">operator,</if>
+            <if test="info != null">info,</if>
+            <if test="status != null">status,</if>
+            <if test="total != null">total,</if>
+            <if test="totalAmount != null">total_amount,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="warehouse != null">#{warehouse},</if>
+            <if test="type != null">#{type},</if>
+            <if test="entryExitTime != null">#{entryExitTime},</if>
+            <if test="operationTime != null">#{operationTime},</if>
+            <if test="operator != null">#{operator},</if>
+            <if test="info != null">#{info},</if>
+            <if test="status != null">#{status},</if>
+            <if test="total != null">#{total},</if>
+            <if test="totalAmount != null">#{totalAmount},</if>
+         </trim>
+    </insert>
+
+    <update id="updateInboundOutboundManagement" parameterType="InboundOutboundManagement">
+        update warehouse
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="warehouse != null">warehouse = #{warehouse},</if>
+            <if test="type != null">type = #{type},</if>
+            <if test="entryExitTime != null">entry_exit_time = #{entryExitTime},</if>
+            <if test="operationTime != null">operation_time = #{operationTime},</if>
+            <if test="operator != null">operator = #{operator},</if>
+            <if test="info != null">info = #{info},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="total != null">total = #{total},</if>
+            <if test="totalAmount != null">total_amount = #{totalAmount},</if>
+        </trim>
+        where id = #{id}
+    </update>
+    <update id="changeStatus">
+        update warehouse
+        SET status=#{status}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteInboundOutboundManagementById" parameterType="Long">
+        delete
+        from warehouse
+        where id = #{id}
+    </delete>
+
+    <delete id="deleteInboundOutboundManagementByIds" parameterType="String">
+        delete from warehouse where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

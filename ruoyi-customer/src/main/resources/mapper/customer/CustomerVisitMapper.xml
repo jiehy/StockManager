@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.wolfcode.customer.visit.mapper.CustomerVisitMapper">
+
+    <resultMap type="CustomerVisit" id="CustomerVisitResult">
+        <result property="id" column="id"/>
+        <result property="customerName" column="customer_name"/>
+        <result property="contactPersonName" column="contact_person_name"/>
+        <result property="visitReason" column="visit_reason"/>
+        <result property="visitWay" column="visit_way"/>
+        <result property="visitDate" column="visit_date"/>
+        <result property="communication" column="communication"/>
+        <result property="entryPerson" column="entry_person"/>
+        <result property="entryTime" column="entry_time"/>
+    </resultMap>
+
+    <sql id="selectCustomerVisitVo">
+        select id,
+               customer_name,
+               contact_person_name,
+               visit_reason,
+               visit_way,
+               visit_date,
+               communication,
+               entry_person,
+               entry_time
+        from customer_visit
+    </sql>
+
+    <select id="selectCustomerVisitList" parameterType="CustomerVisit" resultMap="CustomerVisitResult">
+        <include refid="selectCustomerVisitVo"/>
+        <where>
+            <if test="customerName != null  and customerName != ''">and customer_name like concat('%',
+                #{customerName},'%')
+            </if>
+            <if test="keyword != null  and keyword != ''">and customer_name like concat('%', #{keyword},'%')
+                or contact_person_name like concat('%', #{keyword},'%')
+                or visit_reason like concat('%', #{keyword},'%')
+            </if>
+            <if test="visitWay != null ">and visit_way = #{visitWay}</if>
+            <if test="params.beginVisitDate != null and params.beginVisitDate != '' and params.endVisitDate != null and params.endVisitDate != ''">
+                and visit_date between #{params.beginVisitDate} and #{params.endVisitDate}
+            </if>
+        </where>
+    </select>
+
+    <select id="selectCustomerVisitById" parameterType="Long" resultMap="CustomerVisitResult">
+        <include refid="selectCustomerVisitVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertCustomerVisit" parameterType="CustomerVisit" useGeneratedKeys="true" keyProperty="id">
+        insert into customer_visit
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="customerName != null and customerName != ''">customer_name,</if>
+            <if test="contactPersonName != null and contactPersonName != ''">contact_person_name,</if>
+            <if test="visitReason != null and visitReason != ''">visit_reason,</if>
+            <if test="visitWay != null">visit_way,</if>
+            <if test="visitDate != null">visit_date,</if>
+            <if test="communication != null and communication != ''">communication,</if>
+            <if test="entryPerson != null">entry_person,</if>
+            <if test="entryTime != null">entry_time,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="customerName != null and customerName != ''">#{customerName},</if>
+            <if test="contactPersonName != null and contactPersonName != ''">#{contactPersonName},</if>
+            <if test="visitReason != null and visitReason != ''">#{visitReason},</if>
+            <if test="visitWay != null">#{visitWay},</if>
+            <if test="visitDate != null">#{visitDate},</if>
+            <if test="communication != null and communication != ''">#{communication},</if>
+            <if test="entryPerson != null">#{entryPerson},</if>
+            <if test="entryTime != null">#{entryTime},</if>
+        </trim>
+    </insert>
+
+    <update id="updateCustomerVisit" parameterType="CustomerVisit">
+        update customer_visit
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="customerName != null and customerName != ''">customer_name = #{customerName},</if>
+            <if test="contactPersonName != null and contactPersonName != ''">contact_person_name =
+                #{contactPersonName},
+            </if>
+            <if test="visitReason != null and visitReason != ''">visit_reason = #{visitReason},</if>
+            <if test="visitWay != null">visit_way = #{visitWay},</if>
+            <if test="visitDate != null">visit_date = #{visitDate},</if>
+            <if test="communication != null and communication != ''">communication = #{communication},</if>
+            <if test="entryPerson != null">entry_person = #{entryPerson},</if>
+            <if test="entryTime != null">entry_time = #{entryTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteCustomerVisitById" parameterType="Long">
+        delete
+        from customer_visit
+        where id = #{id}
+    </delete>
+
+    <delete id="deleteCustomerVisitByIds" parameterType="String">
+        delete from customer_visit where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

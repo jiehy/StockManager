@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.wolfcode.entrepot.mapper.EntrepotManagementMapper">
+    
+    <resultMap type="EntrepotManagement" id="EntrepotManagementResult">
+        <result property="id"    column="id"    />
+        <result property="entrepotName"    column="entrepot_name"    />
+        <result property="entrepotAddress"    column="entrepot_address"    />
+    </resultMap>
+
+    <sql id="selectEntrepotManagementVo">
+        select id, entrepot_name, entrepot_address from entrepot_management
+    </sql>
+
+    <select id="selectEntrepotManagementList" parameterType="EntrepotManagement" resultMap="EntrepotManagementResult">
+        <include refid="selectEntrepotManagementVo"/>
+        <where>  
+            <if test="keyword != null  and keyword != ''"> and entrepot_name like concat('%', #{keyword}, '%')</if>
+            <if test="keyword != null  and keyword != ''"> or entrepot_address like concat('%', #{keyword}, '%')</if>
+        </where>
+    </select>
+    
+    <select id="selectEntrepotManagementById" parameterType="Long" resultMap="EntrepotManagementResult">
+        <include refid="selectEntrepotManagementVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertEntrepotManagement" parameterType="EntrepotManagement" useGeneratedKeys="true" keyProperty="id">
+        insert into entrepot_management
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="entrepotName != null">entrepot_name,</if>
+            <if test="entrepotAddress != null">entrepot_address,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="entrepotName != null">#{entrepotName},</if>
+            <if test="entrepotAddress != null">#{entrepotAddress},</if>
+         </trim>
+    </insert>
+
+    <update id="updateEntrepotManagement" parameterType="EntrepotManagement">
+        update entrepot_management
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="entrepotName != null">entrepot_name = #{entrepotName},</if>
+            <if test="entrepotAddress != null">entrepot_address = #{entrepotAddress},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteEntrepotManagementById" parameterType="Long">
+        delete from entrepot_management where id = #{id}
+    </delete>
+
+    <delete id="deleteEntrepotManagementByIds" parameterType="String">
+        delete from entrepot_management where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    <select id="selectEntrepotByInfoId" resultType="ItemInfoDTO">
+        select * from item_info as ii
+        join entrepot_item_info as eii on ii.id=eii.info_id
+        where eii.entrepot_id = #{id}
+    </select>
+
+    <select id="selectEntrepotByManagementId" resultType="ItemManagement">
+        select * from item_management as im
+        join entrepot_item_management as eim on im.id=eim.management_id
+        where eim.entrepot_id = #{id}
+    </select>
+</mapper>

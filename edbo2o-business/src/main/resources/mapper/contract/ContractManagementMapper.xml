@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.wolfcode.contract.mapper.ContractManagementMapper">
+    
+    <resultMap type="ContractManagement" id="ContractManagementResult">
+        <result property="id"    column="id"    />
+        <result property="affiliateCustomers"    column="affiliate_customers"    />
+        <result property="title"    column="title"    />
+        <result property="no"    column="no"    />
+        <result property="amount"    column="amount"    />
+        <result property="startDate"    column="start_date"    />
+        <result property="endDate"    column="end_date"    />
+        <result property="electronicAccessories"    column="electronic_accessories"    />
+        <result property="entryPerson"    column="entry_person"    />
+        <result property="entryTime"    column="entry_time"    />
+        <result property="changeTime"    column="change_time"    />
+        <result property="auditStatus"    column="audit_status"    />
+        <result property="toStamp"    column="to_stamp"    />
+        <result property="invalid"    column="invalid"    />
+    </resultMap>
+
+    <sql id="selectContractManagementVo">
+        select id, affiliate_customers, title, no, amount, start_date, end_date, electronic_accessories, entry_person, entry_time, change_time, audit_status, to_stamp, invalid from contract_management
+    </sql>
+
+    <select id="selectContractManagementList" parameterType="ContractManagement" resultMap="ContractManagementResult">
+        <include refid="selectContractManagementVo"/>
+        <where>  
+            <if test="affiliateCustomers != null  and affiliateCustomers != ''"> and affiliate_customers = #{affiliateCustomers}</if>
+            <if test="entryTime != null "> and entry_time = #{entryTime}</if>
+            <if test="auditStatus != null "> and audit_status = #{auditStatus}</if>
+        </where>
+    </select>
+    
+    <select id="selectContractManagementById" parameterType="Long" resultMap="ContractManagementResult">
+        <include refid="selectContractManagementVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertContractManagement" parameterType="ContractManagement">
+        insert into contract_management
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="affiliateCustomers != null">affiliate_customers,</if>
+            <if test="title != null">title,</if>
+            <if test="no != null">no,</if>
+            <if test="amount != null">amount,</if>
+            <if test="startDate != null">start_date,</if>
+            <if test="endDate != null">end_date,</if>
+            <if test="electronicAccessories != null">electronic_accessories,</if>
+            <if test="entryPerson != null">entry_person,</if>
+            <if test="entryTime != null">entry_time,</if>
+            <if test="changeTime != null">change_time,</if>
+            <if test="auditStatus != null">audit_status,</if>
+            <if test="toStamp != null">to_stamp,</if>
+            <if test="invalid != null">invalid,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="affiliateCustomers != null">#{affiliateCustomers},</if>
+            <if test="title != null">#{title},</if>
+            <if test="no != null">#{no},</if>
+            <if test="amount != null">#{amount},</if>
+            <if test="startDate != null">#{startDate},</if>
+            <if test="endDate != null">#{endDate},</if>
+            <if test="electronicAccessories != null">#{electronicAccessories},</if>
+            <if test="entryPerson != null">#{entryPerson},</if>
+            <if test="entryTime != null">#{entryTime},</if>
+            <if test="changeTime != null">#{changeTime},</if>
+            <if test="auditStatus != null">#{auditStatus},</if>
+            <if test="toStamp != null">#{toStamp},</if>
+            <if test="invalid != null">#{invalid},</if>
+         </trim>
+    </insert>
+
+    <update id="updateContractManagement" parameterType="ContractManagement">
+        update contract_management
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="affiliateCustomers != null">affiliate_customers = #{affiliateCustomers},</if>
+            <if test="title != null">title = #{title},</if>
+            <if test="no != null">no = #{no},</if>
+            <if test="amount != null">amount = #{amount},</if>
+            <if test="startDate != null">start_date = #{startDate},</if>
+            <if test="endDate != null">end_date = #{endDate},</if>
+            <if test="electronicAccessories != null">electronic_accessories = #{electronicAccessories},</if>
+            <if test="entryPerson != null">entry_person = #{entryPerson},</if>
+            <if test="entryTime != null">entry_time = #{entryTime},</if>
+            <if test="changeTime != null">change_time = #{changeTime},</if>
+            <if test="auditStatus != null">audit_status = #{auditStatus},</if>
+            <if test="toStamp != null">to_stamp = #{toStamp},</if>
+            <if test="invalid != null">invalid = #{invalid},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteContractManagementById" parameterType="Long">
+        delete from contract_management where id = #{id}
+    </delete>
+
+    <delete id="deleteContractManagementByIds" parameterType="String">
+        delete from contract_management where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.wolfcode.business.report.mapper.ReportMapper">
+    <sql id="basicWhere">
+        <if test="groupDim == 1">AND appointment_id ${notNull}</if>
+    </sql>
+
+    <select id="selectReportList" resultType="java.util.Map">
+        SELECT
+            IFNULL(DATE_FORMAT(pay_time,#{exp}),'未支付') AS time
+            ,COUNT(id) AS count
+        FROM
+            bus_statement
+        WHERE
+            1=1
+            <include refid="basicWhere"/>
+        GROUP BY
+            time
+        ORDER BY
+            time DESC
+    </select>
+    <select id="selectCountMoneyList" resultType="java.util.Map">
+        SELECT
+            'E店' AS store,
+            IFNULL(DATE_FORMAT(pay_time,#{exp}),'错误数据') AS time,
+            SUM(total_amount) AS statAmount,
+            SUM(total_amount - discount_amount) AS auditAmount
+        FROM
+            bus_statement
+        WHERE
+            status = 1 <include refid="basicWhere"/>
+        GROUP BY
+            time
+        ORDER BY
+            time DESC
+    </select>
+    <select id="selectUserConsumptionAmount" resultType="java.util.Map">
+    SELECT
+        customer_name AS name,
+        customer_phone AS phone,
+        SUM(total_amount - discount_amount) AS money
+    FROM
+        bus_statement
+    WHERE
+        1=1
+        <if test="startTime != null">AND DATE_FORMAT(pay_time,'%Y-%m-%d') &gt;= DATE_FORMAT(params.startTime,'%Y-%m-%d')</if>
+        <if test="endTime != null">AND DATE_FORMAT(pay_time,'%Y-%m-%d') &lt;= DATE_FORMAT(params.endTime,'%Y-%m-%d')</if>
+    GROUP BY
+        name,phone
+    ORDER BY
+        money DESC
+    </select>
+</mapper>

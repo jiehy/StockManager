@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.wolfcode.classification.mapper.ClassifyManagementMapper">
+    
+    <resultMap type="ClassifyManagement" id="ClassifyManagementResult">
+        <result property="id"    column="id"    />
+        <result property="superiorClassify"    column="superior_classify"    />
+        <result property="classify"    column="classify"    />
+        <result property="classifyDescribe"    column="classify_describe"    />
+        <result property="classifyHierarchy"    column="classify_hierarchy"    />
+    </resultMap>
+
+    <resultMap type="SuperiorClassifyVO" id="ClassifyManagementResultTwo">
+        <result property="id"    column="id"    />
+        <result property="classify"    column="classify"    />
+        <collection property="children" javaType="SuperiorClassifyVO">
+            <result property="id" column="t_id"/>
+            <result property="classify" column="t_classify"/>
+            <collection property="children" javaType="SuperiorClassifyVO">
+                <result property="id" column="s_id"/>
+                <result property="classify" column="s_classify"/>
+            </collection>
+        </collection>
+    </resultMap>
+
+    <sql id="selectClassifyManagementVo">
+        select id, superior_classify, classify, classify_describe, classify_hierarchy from classify_management
+    </sql>
+
+    <select id="selectClassifyManagementList" parameterType="ClassifyManagement" resultMap="ClassifyManagementResult">
+        <include refid="selectClassifyManagementVo"/>
+        <where>  
+            <if test="superiorClassify != null  and superiorClassify != ''"> and superior_classify = #{superiorClassify}  OR id = #{superiorClassify}</if>
+            <if test="classify != null  and classify != ''"> and classify = #{classify}</if>
+            <if test="classifyDescribe != null  and classifyDescribe != ''"> and classify_describe = #{classifyDescribe}</if>
+            <if test="classifyHierarchy != null  and classifyHierarchy != ''">and classify_hierarchy LIKE
+                CONCAT(#{classifyHierarchy},'_','%')
+            </if>
+        </where>
+    </select>
+    
+    <select id="selectClassifyManagementById" parameterType="Long" resultMap="ClassifyManagementResult">
+        <include refid="selectClassifyManagementVo"/>
+        where id = #{id}
+    </select>
+
+    <select id="selectSuperiorClassifyList" resultMap="ClassifyManagementResult">
+        <include refid="selectClassifyManagementVo"/>
+    </select>
+    <select id="selectClassifyBySuperiorClassifyId" resultMap="ClassifyManagementResult">
+        <include refid="selectClassifyManagementVo"/>
+        WHERE superior_classify = #{id} AND id !=#{id}
+    </select>
+    <select id="selectAllList" resultMap="ClassifyManagementResult">
+        select DISTINCT id, classify
+        from classify_management
+    </select>
+
+    <insert id="insertClassifyManagement" parameterType="ClassifyManagement" useGeneratedKeys="true" keyProperty="id">
+        insert into classify_management
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="superiorClassify != null">superior_classify,</if>
+            <if test="classify != null">classify,</if>
+            <if test="classifyDescribe != null">classify_describe,</if>
+            <if test="classifyHierarchy != null">classify_hierarchy,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="superiorClassify != null">#{superiorClassify},</if>
+            <if test="classify != null">#{classify},</if>
+            <if test="classifyDescribe != null">#{classifyDescribe},</if>
+            <if test="classifyHierarchy != null">#{classifyHierarchy},</if>
+         </trim>
+    </insert>
+
+    <update id="updateClassifyManagement" parameterType="ClassifyManagement">
+        update classify_management
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="superiorClassify != null">superior_classify = #{superiorClassify},</if>
+            <if test="classify != null">classify = #{classify},</if>
+            <if test="classifyDescribe != null">classify_describe = #{classifyDescribe},</if>
+            <if test="classifyHierarchy != null">classify_hierarchy = #{classifyHierarchy},</if>
+        </trim>
+        where id = #{id}
+    </update>
+    <update id="moveChildClassifyBySuperiorId">
+        update classify_management
+        SET classify_hierarchy = #{classifyHierarchy}
+        where superior_classify = #{id}
+    </update>
+
+    <delete id="deleteClassifyManagementById" parameterType="Long">
+        delete from classify_management where id = #{id}
+    </delete>
+
+
+    <delete id="deleteClassifyManagementByIds" parameterType="String">
+        delete from classify_management where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    <delete id="deleteClassifyManagementBySuperiorClassify">
+        delete from classify_management where superior_classify = #{id}
+    </delete>
+    <delete id="deleteClassifyManagementByClassifyHierarchy">
+        delete
+        from classify_management
+        where classify_hierarchy LIKE CONCAT(#{classifyHierarchy}, '%')
+    </delete>
+</mapper>
